@@ -1,0 +1,6 @@
+[g]
+expand = "github.com"
+[g.d]
+expand = "darrylpargeter"
+[g.d.p]
+expand = "hi"
