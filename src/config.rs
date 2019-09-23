@@ -1,5 +1,5 @@
-use std::fs;
 use toml;
+use std::fs;
 use toml::Value;
 
 pub fn get_config() -> toml::Value {

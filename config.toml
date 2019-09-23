@@ -4,3 +4,11 @@ expand = "github.com"
 expand = "darrylpargeter"
 [g.d.p]
 expand = "hi"
+
+[news.g]
+expand = "theguardian.com/uk"
+
+[news.b]
+expand = "bbc.co.uk"
+
+[d]

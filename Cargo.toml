@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 toml = "0.5"
 rocket = "0.4.2"
+notify = "4.0.12"
+hotwatch = "0.4.2"

@@ -3,61 +3,53 @@
 
 extern crate quacken;
 
-use quacken::config;
-use quacken::expand_path;
-
-use rocket::Outcome;
-use rocket::http::Status;
-use rocket::request::{self, Request, FromRequest};
-
+use quacken::{ config };
+use quacken::token::Token;
 use std::path::PathBuf;
+use rocket::response::Redirect;
 
-#[derive(Debug)]
-enum ApiKeyError {
-    BadCount,
-    Missing,
-    Invalid,
-}
+use hotwatch::{Hotwatch, Event};
 
-#[derive(Debug)]
-struct Token(String);
-
-impl<'a, 'r> FromRequest<'a, 'r> for Token {
-    type Error = ApiKeyError;
-
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
-        let host = request.headers().get("Host").next().unwrap();
-        let path = request.uri().path();
-        let mut token = String::new();
-
-        token.push_str(host);
-        token.push_str(path);
-
-        Outcome::Success(Token(token))
-    }
-}
-
-
-
+// TODO move this into its own file 
+// if you can 
 #[get("/<params..>")]
-fn index(params: PathBuf, token: Token) -> String {
-    let Token(token) = token;
-    println!("token: {}", token);
+fn expand_params(params: PathBuf, token: Token) -> Redirect {
+    redirect_to_host(token)
+}
 
+#[get("/")]
+fn expand_without_params(token: Token) -> Redirect {
+    redirect_to_host(token)
+}
+
+fn redirect_to_host(token: Token) -> Redirect {
+// get the config
     let config = config::get_config();
-
-    let path = expand_path::get_path(&token, config);
-    println!("path: {}", path);
-    // TODO Redirect
-    String::from("YAY")
+// build path
+    let path = token.get_path(config);
+// format into url
+    let fmt = format!("https://{}", path);
+// redirect to the expanded url
+    Redirect::to(fmt)
 }
 
 fn main() {
-    let config = config::get_config();
-    let url: &str = "g/d/p";
+    let mut hotwatch = Hotwatch::new().expect("hotwatch failed to initialize!");
+    hotwatch.watch("./config.toml", |event: Event| {
+        if let Event::Write(path) = event {
+            let config = config::get_config();
+            let table = config.as_table().unwrap();
 
-    let path = expand_path::get_path(url, config);
-    println!("path: {}", path);
-
-    rocket::ignite().mount("/", routes![index]).launch();
+            for key in table.keys() {
+                println!("key: {}", key);
+            }
+        }
+    }).expect("failed to watch file!");
+    // start the web server with the bash path
+    rocket::ignite()
+        .mount("/", routes![
+           expand_params,
+           expand_without_params
+        ])
+        .launch();
 }
