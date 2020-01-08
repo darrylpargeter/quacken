@@ -1,21 +1,24 @@
 use toml;
 use std::fs;
 use toml::Value;
+use dirs;
 
 // for file reading
 use std::fs::File;
-use std::io::BufReader;
 use std::io::prelude::*;
 use regex::{Regex, NoExpand};
+use std::path::Path;
 
 const DELIMT_START: &str = "### quacken shortcuts :start ###\n";
 const DELIMT_END: &str = "### quacken shortcuts :end ###\n";
 
 pub fn get_config() -> toml::Value {
-    let file_name: &str = "./config.toml";
+    // get the config dir
+    let mut file_name = dirs::config_dir().unwrap();
+    file_name.push("quacken/config.toml");
 
     // get the contents from config file
-    let file_contents = fs::read_to_string(file_name)
+    let file_contents = fs::read_to_string(&file_name)
     .expect("Something went wrong reading the file");
 
     // parse the config file
@@ -37,9 +40,7 @@ pub fn update_config() {
     }
     replacemnt.push_str(DELIMT_END);
 
-    // TODO get the config file and update its contents
     let mut buffer = String::new();
-    //let mut hosts = File::open("/etc/hosts")
     let mut hosts = File::open(path)
         .expect("File not found or cannot be opened");
 
@@ -51,8 +52,8 @@ pub fn update_config() {
 
     if !re.is_match(buffer.as_str()) {
         let mut data = buffer.to_owned();
-        let updatedHost = replacemnt.to_owned();
-        data.push_str(&updatedHost);
+        let updated_host = replacemnt.to_owned();
+        data.push_str(&updated_host);
         updated_content = data;
     } else {
         let re = Regex::new(r"(###(.*)##)\n(.|\n)*(###(.*)##\n)").unwrap();

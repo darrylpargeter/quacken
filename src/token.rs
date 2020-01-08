@@ -18,7 +18,6 @@ pub struct Token{
     tokenize: String,
 }
 
-// TODO work out 100% what below dose/ means
 impl<'a, 'r> FromRequest<'a, 'r> for Token {
     type Error = ApiKeyError;
 
@@ -41,8 +40,13 @@ impl Token {
                 None => break,
                 Some(x) => {
                     if let Some(value) = x.get("expand") {
+                        // if part of the parth existis add a / for
+                        // the next part of the url
+                        if path.chars().count() >= 1 {
+                          path.push_str("/");
+                        }
+                        // add to the path
                         path.push_str(value.as_str().unwrap());
-                        path.push_str("/");
                     };
                     x.clone()
                 },

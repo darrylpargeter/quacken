@@ -3,6 +3,7 @@
 
 extern crate quacken;
 extern crate regex;
+extern crate dirs;
 
 use quacken::{ config };
 use quacken::token::Token;
@@ -28,6 +29,7 @@ fn redirect_to_host(token: Token) -> Redirect {
     let config = config::get_config();
 // build path
     let path = token.get_path(config);
+    println!("redirecting to: {}", path);
 // format into url
     let fmt = format!("https://{}", path);
 // redirect to the expanded url
@@ -36,12 +38,17 @@ fn redirect_to_host(token: Token) -> Redirect {
 
 fn main() {
     let mut hotwatch = Hotwatch::new().expect("hotwatch failed to initialize!");
-    //  TODO unhard code the config.toml path
-    hotwatch.watch("./config.toml", |event: Event| {
-        if let Event::Write(path) = event {
+    let mut path = dirs::config_dir().unwrap();
+    // 
+    path.push("quacken/config.toml");
+    // watch the config file
+    hotwatch.watch(path, |event: Event| {
+        if let Event::Write(_path) = event {
+            // reload and update the config and /etc/hosts file
             config::update_config();
         }
     }).expect("failed to watch file!");
+
     // start the web server with the bash path
     rocket::ignite()
         .mount("/", routes![

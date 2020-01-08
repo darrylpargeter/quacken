@@ -1,0 +1,15 @@
+[Unit]
+Description=Quacken Url Writer service
+After=network.target
+After=syslog.target
+
+[Service]
+Type=simple
+WorkingDirectory=/etc/quacken
+User=%i
+ExecStart=+/usr/local/bin/quacken RUST_BACKTRACE=1
+Restart=always
+Restart=2s
+
+[Install]
+WantedBy=multi-user.target
