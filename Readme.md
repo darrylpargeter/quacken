@@ -62,3 +62,4 @@ this will output the logs
 - [] simpleify set up
 - [] get it working for at lest mac
 - [] change workingDir to local .config in service
+- [] create a small cli to that will do CRUD the `config.toml`
