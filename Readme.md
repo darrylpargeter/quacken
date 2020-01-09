@@ -37,6 +37,9 @@ set up nightly to only run in current dir
 ### copy service to location
 sudo cp quacken@.service /etc/systemd/system/
 
+### copy rocket config to working dir
+sudo cp `Rocket.toml` to `/etc/quacken`
+
 ### set up config
 in `.config` create the dir `quacken`
 add the file `config.toml` there is an example in the repo
@@ -56,5 +59,6 @@ this will output the logs
 `sudo journalctl -u quacken.service -e -f`
 
 ## TODO
-- simpleify set up
-- get it working for at lest mac
+- [] simpleify set up
+- [] get it working for at lest mac
+- [] change workingDir to local .config in service
