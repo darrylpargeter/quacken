@@ -38,9 +38,12 @@ fn redirect_to_host(token: Token) -> Redirect {
 
 fn main() {
     let mut hotwatch = Hotwatch::new().expect("hotwatch failed to initialize!");
-    let mut path = dirs::config_dir().unwrap();
-    // 
-    path.push("quacken/config.toml");
+    // get the config path
+    let path = config::get_config_path();
+
+    // at start up make sure that /etc/hosts holds the current keys
+    config::update_config();
+
     // watch the config file
     hotwatch.watch(path, |event: Event| {
         if let Event::Write(_path) = event {
