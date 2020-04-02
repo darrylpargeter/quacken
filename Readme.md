@@ -64,3 +64,4 @@ this will output the logs
 - [] change workingDir to local .config in service
 - [] create a small cli to that will do CRUD the `config.toml`
 - [] update `/etc/hotst` at start up
+- [] give the user the ability to define protocol
